@@ -20,20 +20,6 @@ CSG = function() {
       return this.polygons;
     },
   
-    // Return a new CSG solid representing space in either this solid or in the
-    // solid `csg`. Neither this solid nor the solid `csg` are modified.
-    // 
-    //     A.union(B)
-    // 
-    //     +-------+            +-------+
-    //     |       |            |       |
-    //     |   A   |            |       |
-    //     |    +--+----+   =   |       +----+
-    //     +----+--+    |       +----+       |
-    //          |   B   |            |       |
-    //          |       |            |       |
-    //          +-------+            +-------+
-    // 
     union: function(csg) {
       var a = new CSG.Node(this.clone().polygons);
       var b = new CSG.Node(csg.clone().polygons);
@@ -46,20 +32,6 @@ CSG = function() {
       return CSG.fromPolygons(a.allPolygons());
     },
   
-    // Return a new CSG solid representing space in this solid but not in the
-    // solid `csg`. Neither this solid nor the solid `csg` are modified.
-    // 
-    //     A.subtract(B)
-    // 
-    //     +-------+            +-------+
-    //     |       |            |       |
-    //     |   A   |            |       |
-    //     |    +--+----+   =   |    +--+
-    //     +----+--+    |       +----+
-    //          |   B   |
-    //          |       |
-    //          +-------+
-    // 
     subtract: function(csg) {
       var a = new CSG.Node(this.clone().polygons);
       var b = new CSG.Node(csg.clone().polygons);
@@ -73,21 +45,14 @@ CSG = function() {
       a.invert();
       return CSG.fromPolygons(a.allPolygons());
     },
+
+    clippedBy: function(csg) {
+      var a = new CSG.Node(this.clone().polygons);
+      var b = new CSG.Node(csg.clone().polygons);
+      a.clipTo(b);
+      return CSG.fromPolygons(a.allPolygons());
+    },
   
-    // Return a new CSG solid representing space both this solid and in the
-    // solid `csg`. Neither this solid nor the solid `csg` are modified.
-    // 
-    //     A.intersect(B)
-    // 
-    //     +-------+
-    //     |       |
-    //     |   A   |
-    //     |    +--+----+   =   +--+
-    //     +----+--+    |       +--+
-    //          |   B   |
-    //          |       |
-    //          +-------+
-    // 
     intersect: function(csg) {
       var a = new CSG.Node(this.clone().polygons);
       var b = new CSG.Node(csg.clone().polygons);
@@ -432,4 +397,34 @@ CSG.cube = function(options) {
         return new CSG.Vertex(pos, new CSG.Vector(info[1]));
       }));
     }));
+};
+
+CSG.sphere = function(options) {
+  options = options || {};
+  var c = new CSG.Vector(options.center || [0, 0, 0]);
+  var r = options.radius || 1;
+  var slices = options.slices || 16;
+  var stacks = options.stacks || 8;
+  var polygons = [], vertices;
+  function vertex(theta, phi) {
+    theta *= Math.PI * 2;
+    phi *= Math.PI;
+    var dir = new CSG.Vector(
+      Math.cos(theta) * Math.sin(phi),
+      Math.cos(phi),
+      Math.sin(theta) * Math.sin(phi)
+    );
+    vertices.push(new CSG.Vertex(c.plus(dir.times(r)), dir));
+  }
+  for (var i = 0; i < slices; i++) {
+    for (var j = 0; j < stacks; j++) {
+      vertices = [];
+      vertex(i / slices, j / stacks);
+      if (j > 0) vertex((i + 1) / slices, j / stacks);
+      if (j < stacks - 1) vertex((i + 1) / slices, (j + 1) / stacks);
+      vertex(i / slices, (j + 1) / stacks);
+      polygons.push(new CSG.Polygon(vertices));
+    }
+  }
+  return CSG.fromPolygons(polygons);
 };
