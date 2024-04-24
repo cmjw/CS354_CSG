@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+    <body>
+        <script src="./lib/lightgl/lightgl.js"></script>
+        <script src="./csglibrary.js"></script>
+        <script src="./lib/viewer.js"></script>
+        
+
+        <table>
+            <tr>
+              <td><div id="0" class="viewer" style="background-position:-1px -1px;"></div><code>a</code></td>
+              <td><div id="1" class="viewer" style="background-position:-202px -1px;"></div><code>b</code></td>
+              <td><div id="2" class="viewer" style="background-position:-804px -1px;"></div><code>c</code></td>
+              <td><div id="3" class="viewer" style="background-position:-202px -202px;"></div><code>b.subtract(a).subtract(c)</code></td>
+            </tr>
+        </table>
+
+        <script>
+            // Example test
+
+            var a = CSG.cube({center: [1,1,0] });
+            var b = CSG.cube({center: [0,0,0] });
+            var c = CSG.cube({center: [-1,-1,0] });
+
+            a.setColor(0.643, 0, 1);
+            c.setColor(0, 0.663, 1);
+            b.setColor(0.98, 0.569, 0.91);
+
+            addViewer(new Viewer(a, 400, 400, 6));
+            addViewer(new Viewer(b, 400, 400, 6));
+            addViewer(new Viewer(c, 400, 400, 6));
+            addViewer(new Viewer(b.subtract(a).subtract(c), 400, 400, 6));
+        </script>
+    </body>
+</html>

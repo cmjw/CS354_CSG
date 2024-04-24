@@ -403,8 +403,8 @@ CSG.sphere = function(options) {
   options = options || {};
   var c = new CSG.Vector(options.center || [0, 0, 0]);
   var r = options.radius || 1;
-  var slices = options.slices || 16;
-  var stacks = options.stacks || 8;
+  var slices = options.slices || 32;
+  var stacks = options.stacks || 16;
   var polygons = [], vertices;
   function vertex(theta, phi) {
     theta *= Math.PI * 2;
