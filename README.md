@@ -7,3 +7,6 @@ CS 354
 
 Lightgl - https://github.com/evanw/lightgl.js/
 
+# Build
+
+Build lightgl by running python3 build in the lib/lightgl directory
